@@ -1,7 +1,5 @@
 package com.google.devrel.training.conference.spi;
 
-import static com.google.devrel.training.conference.service.OfyService.ofy;
-
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiMethod.HttpMethod;
@@ -48,20 +46,30 @@ public class ConferenceApi {
 
     // TODO 1 Pass the ProfileForm parameter
     // TODO 2 Pass the User parameter
-    public Profile saveProfile() throws UnauthorizedException {
+    public Profile saveProfile(final User user,ProfileForm profileForm) throws UnauthorizedException {
 
         String userId = null;
         String mainEmail = null;
         String displayName = "Your name will go here";
         TeeShirtSize teeShirtSize = TeeShirtSize.NOT_SPECIFIED;
 
+        if(user==null){
+            throw new UnauthorizedException("not authorized to use service");
+        }
+
+        userId = user.getUserId();
+        mainEmail = user.getEmail();
         // TODO 2
         // If the user is not logged in, throw an UnauthorizedException
 
         // TODO 1
         // Set the teeShirtSize to the value sent by the ProfileForm, if sent
         // otherwise leave it as the default value
+        if(profileForm.getTeeShirtSize()!=null){
+            teeShirtSize = profileForm.getTeeShirtSize();
+        }
 
+        displayName = profileForm.getDisplayName();
         // TODO 1
         // Set the displayName to the value sent by the ProfileForm, if sent
         // otherwise set it to null
@@ -69,6 +77,9 @@ public class ConferenceApi {
         // TODO 2
         // Get the userId and mainEmail
 
+        if(displayName==null){
+            displayName = extractDefaultDisplayNameFromEmail(mainEmail);
+        }
         // TODO 2
         // If the displayName is null, set it to default value based on the user's email
         // by calling extractDefaultDisplayNameFromEmail(...)
